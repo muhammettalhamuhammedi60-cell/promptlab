@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PromptLab</title>
+
+  <!-- UI tamamen CSS & JS ile yönetiliyor -->
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #f8fafc);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1000px;
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0,0,0,.15);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .panel {
+      padding: 40px;
+    }
+
+    .left {
+      background: linear-gradient(180deg, #2563eb, #1e40af);
+      color: white;
+    }
+
+    .left h1 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    .scenario {
+      margin-top: 30px;
+      background: rgba(255,255,255,.15);
+      padding: 20px;
+      border-radius: 16px;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .right h2 {
+      margin-top: 0;
+      font-size: 22px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 18px;
+      margin-top: 20px;
+      border-radius: 16px;
+      border: 1px solid #c7d2fe;
+      font-size: 15px;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 16px;
+      border: none;
+      font-size: 16px;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: white;
+      cursor: pointer;
+      transition: transform .1s ease;
+    }
+
+    button:hover { transform: scale(1.02); }
+
+    .result {
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 16px;
+      background: #f1f5f9;
+      display: none;
+      font-size: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 12px;
+      margin: 4px 6px 0 0;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #22c55e;
+      color: white;
+    }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .left { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="panel left">
+    <h1>PromptLab</h1>
+    <p>Prompt yazarak para kazanmayı öğreten interaktif simülatör</p>
+
+    <div class="scenario">
+      <b>🎯 Senaryo</b><br><br>
+      Bir fitness koçu, Instagram için haftalık içerik planını otomatik üretmek istiyor.
+      <br><br>
+      <b>Görevin:</b> Bu ihtiyacı tekrar kullanılabilir bir prompt ile çöz.
+    </div>
+  </div>
+
+  <div class="panel right">
+    <h2>Promptunu Yaz</h2>
+
+    <textarea id="prompt"></textarea>
+    <button onclick="analyze()">Analiz Et</button>
+
+    <div id="result" class="result"></div>
+  </div>
+</div>
+
+<script>
+  function analyze() {
+    const text = document.getElementById('prompt').value.toLowerCase();
+    const box = document.getElementById('result');
+
+    let tags = [];
+
+    if (text.includes('sen ') || text.includes('rol')) tags.push('ROL');
+    if (text.includes('amaç') || text.includes('hedef')) tags.push('AMAÇ');
+    if (text.includes('format') || text.includes('madde') || text.includes('liste')) tags.push('FORMAT');
+    if (text.includes('kısıt') || text.includes('kullanma') || text.includes('geçme')) tags.push('KISIT');
+
+    box.style.display = 'block';
+    box.innerHTML = `
+      <b>Değerlendirme</b><br><br>
+      ${tags.length ? tags.map(t => `<span class="tag">${t}</span>`).join('') : '⚠️ Prompt çok genel'}
+      <p style="margin-top:15px"><b>İpucu:</b> Çıktı örneği eklersen satış değeri artar.</p>
+    `;
+  }
+</script>
+
+</body>
+</html>
