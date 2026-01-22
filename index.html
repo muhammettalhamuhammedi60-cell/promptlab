@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PromptLab Pro</title>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --secondary: #6366f1;
+      --bg: #f8fafc;
+      --dark: #0f172a;
+      --success: #22c55e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: radial-gradient(circle at top, #eef2ff, var(--bg));
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--dark);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 40px 120px rgba(0,0,0,.18);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+    }
+
+    .sidebar {
+      padding: 48px;
+      background: linear-gradient(180deg, var(--primary), #3730a3);
+      color: white;
+    }
+
+    .sidebar h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .level {
+      margin-top: 10px;
+      opacity: .9;
+      font-size: 14px;
+    }
+
+    .scenario {
+      margin-top: 32px;
+      background: rgba(255,255,255,.15);
+      padding: 24px;
+      border-radius: 20px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .main {
+      padding: 48px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid #c7d2fe;
+      font-size: 15px;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 18px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: white;
+      cursor: pointer;
+    }
+
+    .result {
+      display: none;
+      margin-top: 28px;
+      padding: 24px;
+      background: #f8fafc;
+      border-radius: 20px;
+    }
+
+    .progress {
+      height: 14px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px 0;
+    }
+
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--success), #16a34a);
+      width: 0;
+      transition: width .4s ease;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 14px;
+      margin: 4px 6px 0 0;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--success);
+      color: white;
+    }
+
+    .coach {
+      margin-top: 16px;
+      background: #eef2ff;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      color: #1e3a8a;
+    }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="sidebar">
+    <h1>PromptLab</h1>
+    <div id="level" class="level"></div>
+    <div id="scenario" class="scenario"></div>
+  </div>
+
+  <div class="main">
+    <h2>Promptunu Yaz</h2>
+    <textarea id="prompt" placeholder="Promptunu buraya yaz..."></textarea>
+    <button onclick="evaluatePrompt()">Değerlendir</button>
+    <div id="result" class="result"></div>
+  </div>
+
+</div>
+
+<script>
+  const scenarios = [
+    { level: 1, text: "Bir fitness koçu Instagram için haftalık içerik planı üretmek istiyor." },
+    { level: 2, text: "Bir emlak danışmanı satılık ilan metinlerini otomatik yazmak istiyor." },
+    { level: 3, text: "Bir online eğitmen satış odaklı webinar e-postaları hazırlamak istiyor." },
+    { level: 4, text: "Bir e-ticaret markası SEO uyumlu ürün açıklamaları üretmek istiyor." }
+  ];
+
+  let currentLevel = 0;
+
+  function loadScenario() {
+    document.getElementById("level").innerText = `Seviye ${scenarios[currentLevel].level}`;
+    document.getElementById("scenario").innerHTML =
+      `<b>🎯 Senaryo</b><br><br>${scenarios[currentLevel].text}`;
+    document.getElementById("prompt").value = "";
+    document.getElementById("result").style.display = "none";
+  }
+
+  loadScenario();
+
+  function evaluatePrompt() {
+    const text = document.getElementById("prompt").value.toLowerCase();
+    const result = document.getElementById("result");
+
+    let score = 0;
+    let tags = [];
+    let feedback = [];
+
+    if (text.includes("rol") || text.includes("sen ")) {
+      score++; tags.push("ROL");
+    } else feedback.push("Bir rol tanımı ekle.");
+
+    if (text.includes("amaç") || text.includes("hedef")) {
+      score++; tags.push("AMAÇ");
+    } else feedback.push("Promptun amacını netleştir.");
+
+    if (text.includes("format") || text.includes("liste") || text.includes("tablo")) {
+      score++; tags.push("FORMAT");
+    } else feedback.push("Çıktı formatını belirt.");
+
+    if (text.includes("kısıt") || text.includes("geçme") || text.includes("kullanma")) {
+      score++; tags.push("KISIT");
+    } else feedback.push("Kısıt ekleyerek kontrolü artır.");
+
+    const percent = Math.round((score / 4) * 100);
+
+    result.style.display = "block";
+    result.innerHTML = `
+      <b>Değerlendirme</b>
+      <div class="progress">
+        <div class="bar" style="width:${percent}%"></div>
+      </div>
+      ${tags.map(t => `<span class="tag">${t}</span>`).join("")}
+      <div class="coach">
+        <b>AI Koçun:</b><br>
+        ${percent === 100 ? "Mükemmel! Bir üst seviyeye geçiyorsun." : feedback.join("<br>")}
+      </div>
+    `;
+
+    if (percent === 100 && currentLevel < scenarios.length - 1) {
+      setTimeout(() => {
+        currentLevel++;
+        loadScenario();
+      }, 2000);
+    }
+  }
+</script>
+
+</body>
+</html>
